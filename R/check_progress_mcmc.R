@@ -1,4 +1,4 @@
-check_progress_mcmc <- function(outfile, nchain, sleep_length = 10){
+check_progress_mcmc <- function(outfile, nchain, sleep_length = 5){
   # Have to fit 
   is_running <- TRUE
   iter = 1
@@ -12,8 +12,13 @@ check_progress_mcmc <- function(outfile, nchain, sleep_length = 10){
     }
     tmp <- tmp[grep("^\\|-",tmp)]
     if(length(tmp) == 0){
-      cat("Nimble model getting set up. Checking again in 30 seconds...\n")
-      Sys.sleep(30)
+      cat(
+        paste(
+          "Nimble model getting set up. Checking again in",
+          sleep_length * 2,"seconds...\n"
+        )
+      )
+      Sys.sleep(sleep_length * 2)
       next
     } else {
       nran <- nchar(tmp[length(tmp)])

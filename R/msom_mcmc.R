@@ -1,9 +1,14 @@
 # Read in the data
 library(nimble)
 library(doParallel)
-library(callr)
 
 source("./R/params.R")
+
+ # start up the cluster
+my_cluster <- makeCluster(
+  n_chains,
+  outfile = my_outfile
+)
 
 # site by species matrix, max number of surveys = 4
 y <- read.csv("./data/species_data.R")
@@ -13,7 +18,7 @@ x <- read.csv("./data/design_matrix.R")
 
 # query some values we'd need for the model
 nsite <- nrow(y)
-nspecies <- col(y)
+nspecies <- ncol(y)
 nsurvey <- 4
 
 # the data list for nimble
@@ -177,16 +182,14 @@ msom_mcmc <- function(seed, data_list, constant_list, niter = n_iterations){
 }
 
 # fit the model
-my_cluster <- makeCluster(
-  n_chains,
-  outfile = my_outfile
-)
+
 chain_output <- parLapply(
   my_cluster,
   X = 1:n_chains,
   fun = msom_mcmc,
   data_list = data_list,
-  constant_list = constant_list
+  constant_list = constant_list,
+  niter = n_iterations
 )
 stopCluster(my_cluster)
 
